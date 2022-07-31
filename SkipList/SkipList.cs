@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -30,20 +31,18 @@ namespace SkipList
         }
     }
 
-    class SkipList<T> where T : IComparable<T>
+    class SkipList<T> : ICollection<T>
+        where T : IComparable<T>
     {
         Random random;
-
         public int Count { get; private set; }
+        public bool IsReadOnly => false;
         public Node<T> head;
-
         public SkipList(Random random)
         {
             this.random = random;
             head = new Node<T>(default, 1);
         }
-
-
         private int getRandomHeight()
         {
             int temp = 1;
@@ -60,7 +59,6 @@ namespace SkipList
             }
             return temp;
         }
-
         public void ResizeHead(int oldHeight, int NewHeight)
         {
             if (oldHeight >= NewHeight)
@@ -74,8 +72,7 @@ namespace SkipList
                 head = newHead;
             }
         }
-
-        public void Insert(T value)
+        public void Add(T value)
         {
             int newHeight = getRandomHeight();
             ResizeHead(head.Height, newHeight);
@@ -90,7 +87,7 @@ namespace SkipList
             {
 
                 //another loop for finding where to insert in hte current doubly linked list
-                while (value.CompareTo(current.value) > 0 && current.next != null)
+                while (current.next != null && value.CompareTo(current.next.value) > 0)
                 {
                     current = current.next;
                 }
@@ -110,13 +107,18 @@ namespace SkipList
                         lastInserted = Inserted;
                     }
                 }
-                else //This does not work, inserting at the end works
+                else
                 {
 
                     Node<T> Inserted = new Node<T>(value, current.Height);
-                    Inserted.prev = current.prev;
+                    Inserted.prev = current;
                     Inserted.next = current.next;
+                    current.next = Inserted;
+                    if (current.prev != null)
+                    {
 
+                        Inserted.next.prev = Inserted;
+                    }
                     if (lastInserted == null)
                     {
                         lastInserted = Inserted;
@@ -134,7 +136,92 @@ namespace SkipList
             Count++;
 
         }
+        public void Clear()
+        {
+            Count = 0;
+            head.next = null;
+            head = new Node<T>(default, 1);
+        }
+        public bool Contains(T item)
+        {
+            return Search(item) != null;
+        }
+
+        public Node<T> Search(T item)
+        {
+            Node<T> current = head;
+            while (current.value.CompareTo(item) != 0)
+            {
+                while (current.next != null)
+                {
+                    current = current.next;
+                }
+                if ((current.next == null && current.down != null) || current.next.value.CompareTo(item) > 0)
+                {
+                    current = current.down;
+                }
+            }
+            return current; 
+            //while (current.next != null && current.down != null || current.value.CompareTo(item) == 0)
+            //{
+            //    if (current.next.value.CompareTo(item) > 0)
+            //    {
+            //        current = current.next;
+            //    }
+            //    else 
+            //    {
+            //        current = current.down;
+            //    }
+            //}
+            //while (current != null)
+            //{
+            //    if (current.value.CompareTo(item) == 0)
+            //    {
+            //        return current;
+            //    }
+            //    current = current.next;
+            //}
+            //return null;
+        }
+        public bool Remove(T item)
+        {
+            Node<T> deleted = Search(item);
+            while (Contains(item) == true)
+            {
+                if (deleted.next != null)
+                {
+                    deleted.prev.next = deleted.next;
+                    deleted.next.prev = deleted.prev;
+                    
+                }
+                else
+                {
+                    deleted.prev.next = null; 
+                }
+                if (deleted.down != null)
+                {
+                    deleted = deleted.down;
+                }
+            }
+            Count--; 
+            return true; 
+        }
 
 
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

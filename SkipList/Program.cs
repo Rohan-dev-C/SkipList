@@ -9,8 +9,14 @@ namespace SkipList
             Random random = new Random(45);
             SkipList<int> list = new SkipList<int>(random);
 
-            list.Insert(1);
-            list.Insert(2); 
+            list.Add(1);
+            list.Add(3);
+            list.Add(5);
+            list.Add(4);
+            list.Add(2);
+
+            list.Remove(5); 
+            
         }
     }
 }
