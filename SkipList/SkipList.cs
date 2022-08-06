@@ -10,7 +10,6 @@ namespace SkipList
 
         public T value;
         public Node<T> next { get; set; }
-        public Node<T> prev { get; set; }
 
         public int Height { get; set; }
 
@@ -95,7 +94,6 @@ namespace SkipList
                 {
                     Node<T> Inserted = new Node<T>(value, current.Height);
                     current.next = Inserted;
-                    Inserted.prev = current;
 
                     if (lastInserted == null)
                     {
@@ -111,14 +109,8 @@ namespace SkipList
                 {
 
                     Node<T> Inserted = new Node<T>(value, current.Height);
-                    Inserted.prev = current;
                     Inserted.next = current.next;
-                    current.next = Inserted;
-                    if (current.prev != null)
-                    {
-
-                        Inserted.next.prev = Inserted;
-                    }
+                    current.next = Inserted; 
                     if (lastInserted == null)
                     {
                         lastInserted = Inserted;
@@ -150,61 +142,67 @@ namespace SkipList
         public Node<T> Search(T item)
         {
             Node<T> current = head;
+
+
+
             while (current.value.CompareTo(item) != 0)
             {
-                while (current.next != null)
+                if (current.next != null && current.next.value.CompareTo(item) <= 0)
                 {
                     current = current.next;
                 }
-                if ((current.next == null && current.down != null) || current.next.value.CompareTo(item) > 0)
+                else if (current.down != null)
                 {
                     current = current.down;
                 }
-            }
-            return current; 
-            //while (current.next != null && current.down != null || current.value.CompareTo(item) == 0)
-            //{
-            //    if (current.next.value.CompareTo(item) > 0)
-            //    {
-            //        current = current.next;
-            //    }
-            //    else 
-            //    {
-            //        current = current.down;
-            //    }
-            //}
-            //while (current != null)
-            //{
-            //    if (current.value.CompareTo(item) == 0)
-            //    {
-            //        return current;
-            //    }
-            //    current = current.next;
-            //}
-            //return null;
-        }
-        public bool Remove(T item)
-        {
-            Node<T> deleted = Search(item);
-            while (Contains(item) == true)
-            {
-                if (deleted.next != null)
-                {
-                    deleted.prev.next = deleted.next;
-                    deleted.next.prev = deleted.prev;
-                    
-                }
                 else
                 {
-                    deleted.prev.next = null; 
+                    return null;
                 }
-                if (deleted.down != null)
-                {
-                    deleted = deleted.down;
-                }
-            }
-            Count--; 
-            return true; 
+            } 
+
+            return current; 
+        }
+        public bool Remove(T item)
+        //{
+        //    Node<T> deleted = head;
+        //    while (deleted != null)
+        //    {
+        //        if (deleted.next != null || deleted.next.value.CompareTo(item) == 0)
+        //        {
+        //            deleted.next = deleted.next.next;
+        //            deleted = deleted.down;
+        //        }
+        //        else
+        //        {
+        //            deleted = deleted.next;
+        //        }
+        //    } 
+        //    Count--; 
+        //    return true; 
+
+        // FIx thi swithout prev
+
+        //Node<T> current = deleted; 
+        //while(current != null)
+        //{
+        //   if(current == head)
+        //   {
+        //       throw new Exception("cant remove head");
+        //   }
+        //   else
+        //   {
+        //       current = current.down; 
+        //   }
+        //}
+
+        //while (deleted.down != null)
+        //{
+
+        //    Console.WriteLine($"Deleted at {deleted.Height}");
+        //    deleted = deleted.down;             
+        //}
+
         }
 
 
